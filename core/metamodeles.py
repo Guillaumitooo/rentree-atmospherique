@@ -35,6 +35,7 @@ class ResultatModele:
     metriques: dict
     y_test: np.ndarray
     y_pred: np.ndarray
+    X_test: np.ndarray | None = None   # entrées du jeu de test (importance des variables)
 
 
 def creer_regresseur(nom: str, graine: int = 42):
@@ -46,7 +47,7 @@ def creer_regresseur(nom: str, graine: int = 42):
     elif nom == "Forêt aléatoire":
         modele = RandomForestRegressor(n_estimators=200, random_state=graine)
     elif nom == "Processus gaussien":
-        noyau = ConstantKernel() * RBF(length_scale=[1.0] * len(PA)) + WhiteKernel()
+        noyau = ConstantKernel() * RBF(length_scale=[1.0] * len(PA)) + WhiteKernel(1e-6, noise_level_bounds=(1e-10, 1e-1))
         modele = GaussianProcessRegressor(noyau, normalize_y=True, random_state=graine)
     else:
         raise ValueError(f"Modèle de régression inconnu : {nom}")
@@ -78,7 +79,7 @@ def entrainer_regression(df: pd.DataFrame, cible: str, nom: str, graine: int = 4
         "MAE": mean_absolute_error(y_test, y_pred),
         "erreur_max": float(np.max(np.abs(y_test - y_pred))),
     }
-    return ResultatModele(modele, metriques, y_test, y_pred)
+    return ResultatModele(modele, metriques, y_test, y_pred, X_test)
 
 
 def entrainer_classifieur(df: pd.DataFrame, nom: str, graine: int = 42) -> ResultatModele:
@@ -91,7 +92,7 @@ def entrainer_classifieur(df: pd.DataFrame, nom: str, graine: int = 42) -> Resul
         "exactitude": accuracy_score(y_test, y_pred),
         "matrice_confusion": confusion_matrix(y_test, y_pred, labels=[False, True]).tolist(),
     }
-    return ResultatModele(modele, metriques, y_test, y_pred)
+    return ResultatModele(modele, metriques, y_test, y_pred, X_test)
 
 
 class PredicteurCapsule:

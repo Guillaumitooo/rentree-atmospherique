@@ -4,6 +4,23 @@ import streamlit as st
 
 from core.constantes import BORNES_DOE, MISSION_LUNAIRE, Capsule, Mission
 from core.doe import CHEMIN_DOE
+from core.metamodeles import PredicteurCapsule, entrainer_predicteur
+
+# Modèles utilisés par défaut pour la prédiction et l'optimisation (modifiables page 4)
+REGRESSION_DEFAUT = "Processus gaussien"
+CLASSIFIEUR_DEFAUT = "Régression logistique"
+
+
+def modeles_choisis() -> tuple[str, str]:
+    """(nom du modèle de régression, nom du classifieur) choisis sur la page Métamodèles."""
+    return (st.session_state.get("nom_reg", REGRESSION_DEFAUT),
+            st.session_state.get("nom_clf", CLASSIFIEUR_DEFAUT))
+
+
+@st.cache_resource(show_spinner="Apprentissage des métamodèles (une seule fois, ~30 s)…")
+def predicteur(nom_reg: str, nom_clf: str) -> PredicteurCapsule:
+    """Prédicteur hybride entraîné sur le plan d'expériences de référence."""
+    return entrainer_predicteur(charger_doe(), nom_reg, nom_clf)
 
 
 def mission_courante() -> Mission:

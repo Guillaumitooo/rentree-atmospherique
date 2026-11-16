@@ -44,7 +44,7 @@ def creer_regresseur(nom: str, graine: int = 42):
     elif nom == "Polynôme degré 3":
         modele = make_pipeline(PolynomialFeatures(3), Ridge(alpha=1e-3))
     elif nom == "Forêt aléatoire":
-        modele = RandomForestRegressor(n_estimators=200, random_state=graine, n_jobs=-1)
+        modele = RandomForestRegressor(n_estimators=200, random_state=graine)
     elif nom == "Processus gaussien":
         noyau = ConstantKernel() * RBF(length_scale=[1.0] * len(PA)) + WhiteKernel()
         modele = GaussianProcessRegressor(noyau, normalize_y=True, random_state=graine)
@@ -57,7 +57,7 @@ def creer_classifieur(nom: str, graine: int = 42):
     if nom == "Régression logistique":
         modele = LogisticRegression(max_iter=1000)
     elif nom == "Forêt aléatoire":
-        modele = RandomForestClassifier(n_estimators=200, random_state=graine, n_jobs=-1)
+        modele = RandomForestClassifier(n_estimators=200, random_state=graine)
     else:
         raise ValueError(f"Classifieur inconnu : {nom}")
     return make_pipeline(StandardScaler(), modele)

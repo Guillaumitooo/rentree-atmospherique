@@ -74,22 +74,22 @@ with onglet_couloir:
                      hover_data=PA + ["n_max", "T_s_C", "m_b"],
                      labels={"gamma_deg": "Angle d'entrée γ_E [°]", "D": "Diamètre D [m]"})
     fig.update_layout(height=550)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 with onglet_distrib:
     grandeur = st.selectbox("Grandeur", ["n_max", "q_max_MW", "Q_MJ", "t_ch", "T_s_C", "m_b", "e_abl"])
     st.plotly_chart(px.histogram(df[~df["rebond"]], x=grandeur, color="classe", color_discrete_map=couleurs,
                                  nbins=50, title=f"{grandeur} (points sans rebond)"),
-                    use_container_width=True)
+                    width="stretch")
 
 with onglet_corr:
     st.markdown("Corrélations linéaires entre paramètres d'action et résultats (points sans rebond).")
     cols_corr = PA + ["n_max", "q_max_MW", "Q_MJ", "t_ch", "T_s_C", "m_b"]
     corr = df[~df["rebond"]][cols_corr].corr()
     st.plotly_chart(px.imshow(corr, text_auto=".2f", color_continuous_scale="RdBu_r", zmin=-1, zmax=1,
-                              aspect="auto"), use_container_width=True)
+                              aspect="auto"), width="stretch")
     st.caption("Rappel : corrélation ne veut pas dire causalité, et une relation non linéaire peut avoir "
                "une corrélation faible.")
 
 with onglet_table:
-    st.dataframe(df, use_container_width=True, height=450)
+    st.dataframe(df, width="stretch", height=450)

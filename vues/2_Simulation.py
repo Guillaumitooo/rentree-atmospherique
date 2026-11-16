@@ -85,7 +85,7 @@ with onglet_sim:
     fig.update_xaxes(title_text="s [km]", row=2, col=2)
     fig.update_yaxes(title_text="h [km]", row=2, col=2)
     fig.update_layout(height=650, showlegend=False)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
     st.caption(f"Durée simulée {r.duree:.0f} s · chauffe {r.t_ch:.0f} s · portée {r.portee / 1e3:.0f} km")
 
@@ -120,12 +120,12 @@ la formule se trompe d'un facteur 3 à 5 : d'où la nécessité du simulateur.
                    mode="lines", line_dash="dash"),
     ])
     fig_n.update_layout(title="Décélération maximale", xaxis_title="γ_E [°]", yaxis_title="n_max [g]")
-    g1.plotly_chart(fig_n, use_container_width=True)
+    g1.plotly_chart(fig_n, width="stretch")
     fig_q = go.Figure([
         go.Scatter(x=val["γ_E [°]"], y=val["q̇_max simulé [MW/m²]"], name="simulation", mode="lines+markers"),
         go.Scatter(x=val["γ_E [°]"], y=val["q̇_max Allen-Eggers [MW/m²]"], name="Allen-Eggers",
                    mode="lines", line_dash="dash"),
     ])
     fig_q.update_layout(title="Flux thermique maximal", xaxis_title="γ_E [°]", yaxis_title="q̇_max [MW/m²]")
-    g2.plotly_chart(fig_q, use_container_width=True)
-    st.dataframe(val.style.format("{:.1f}"), use_container_width=True, hide_index=True)
+    g2.plotly_chart(fig_q, width="stretch")
+    st.dataframe(val.style.format("{:.1f}"), width="stretch", hide_index=True)

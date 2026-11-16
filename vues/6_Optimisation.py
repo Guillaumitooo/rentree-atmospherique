@@ -140,9 +140,9 @@ with onglet_pareto:
             fig.add_vline(x=mission.n_lim, line_dash="dash", line_color="red")
             fig.update_layout(xaxis_title="Décélération maximale n_max [g]",
                               yaxis_title="Masse du bouclier m_b [kg]", height=500)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
             st.markdown("#### Points re-simulés")
             st.dataframe(
                 verif.assign(e_cm=100 * verif["e"])[["gamma_deg", "D", "rn_sur_d", "e_cm", "m_b", "n_max_sim",
                                                      "ecart_n_max_pct", "T_s_C_sim", "ecart_T_s_C", "respecte"]],
-                hide_index=True, use_container_width=True)
+                hide_index=True, width="stretch")

@@ -65,11 +65,11 @@ with onglet_reg:
                      go.Scatter(x=lim, y=lim, mode="lines", line_dash="dash", name="prédiction parfaite")])
     fig.update_layout(title="Graphe de parité", xaxis_title=f"Simulé — {LIBELLES[cible]}",
                       yaxis_title="Prédit", height=450)
-    g1.plotly_chart(fig, use_container_width=True)
+    g1.plotly_chart(fig, width="stretch")
     imp = importance(cible, nom)
     g2.plotly_chart(px.bar(imp, x="importance", y="paramètre", orientation="h",
                            title="Importance des variables (permutation)").update_layout(height=450),
-                    use_container_width=True)
+                    width="stretch")
 
     if cible == "t_ch":
         st.info("La durée de chauffe est la grandeur la plus difficile à apprendre : près du bord du rebond, "
@@ -82,7 +82,7 @@ with onglet_reg:
             mm = regression(cible, n).metriques
             lignes.append({"modèle": n, "R²": mm["R2"], "RMSE": mm["RMSE"], "MAE": mm["MAE"],
                            "erreur max": mm["erreur_max"]})
-        st.dataframe(pd.DataFrame(lignes).style.format(precision=4), hide_index=True, use_container_width=True)
+        st.dataframe(pd.DataFrame(lignes).style.format(precision=4), hide_index=True, width="stretch")
 
     with st.expander("Modèle hybride utilisé pour la prédiction et l'optimisation"):
         st.markdown(

@@ -95,3 +95,10 @@ def test_verification_affiche_ecarts_et_respect():  # Revue finale (spec §7.5)
     at.button[0].click().run()
     colonnes = list(at.table[0].value.columns)
     assert "Écart" in colonnes and "Respectée" in colonnes
+
+
+def test_pas_de_parametre_streamlit_obsolete():
+    # use_container_width est obsolète (supprimé après 2025-12-31) : il casserait les graphiques
+    fichiers = [RACINE / "Accueil.py", *sorted((RACINE / "vues").glob("*.py"))]
+    fautifs = [f.name for f in fichiers if "use_container_width" in f.read_text(encoding="utf-8")]
+    assert fautifs == []

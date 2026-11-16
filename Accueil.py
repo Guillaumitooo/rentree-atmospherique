@@ -10,6 +10,7 @@ PAGES = [
     st.Page("vues/3_Plan_d_experiences.py", title="3. Plan d'expériences", icon="🎲"),
     st.Page("vues/4_Metamodeles.py", title="4. Métamodèles", icon="🧠"),
     st.Page("vues/5_Prediction.py", title="5. Prédiction", icon="⚡"),
+    st.Page("vues/6_Optimisation.py", title="6. Optimisation", icon="🎯"),
 ]
 
 st.navigation(PAGES).run()

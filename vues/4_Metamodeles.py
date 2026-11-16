@@ -90,8 +90,8 @@ with onglet_reg:
 Pour la température de structure, la prédiction finale **ne vient pas** de la régression directe
 ci-dessus : le métamodèle prédit la chaleur reçue Q et la durée de chauffe t_ch, puis la
 **formule physique du bouclier** calcule l'ablation et la température. C'est un modèle
-**hybride IA + physique**. Avec le processus gaussien, il se trompe en moyenne de ~8 °C près de
-la limite de 250 °C, contre ~11 °C pour la régression directe.
+**hybride IA + physique**. Avec le processus gaussien, il se trompe en moyenne de ~6 °C près de
+la limite de 250 °C, contre ~9 °C pour la régression directe.
 """
         )
 

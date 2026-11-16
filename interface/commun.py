@@ -17,7 +17,7 @@ def modeles_choisis() -> tuple[str, str]:
             st.session_state.get("nom_clf", CLASSIFIEUR_DEFAUT))
 
 
-@st.cache_resource(show_spinner="Apprentissage des métamodèles (une seule fois, ~30 s)…")
+@st.cache_resource(show_spinner="Apprentissage des métamodèles (une seule fois, ~15 s)…")
 def predicteur(nom_reg: str, nom_clf: str) -> PredicteurCapsule:
     """Prédicteur hybride entraîné sur le plan d'expériences de référence."""
     return entrainer_predicteur(charger_doe(), nom_reg, nom_clf)

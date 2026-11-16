@@ -26,7 +26,7 @@ CIBLES = ["n_max", "q_max_MW", "Q_MJ", "t_ch", "T_s_C"]
 CIBLES_PREDICTEUR = ["n_max", "q_max_MW", "Q_MJ", "t_ch"]   # T_s est déduite par la physique
 NOMS_REGRESSION = ["Polynôme degré 2", "Polynôme degré 3", "Forêt aléatoire", "Processus gaussien"]
 NOMS_CLASSIFIEUR = ["Régression logistique", "Forêt aléatoire"]
-N_MAX_PROCESSUS_GAUSSIEN = 800   # le processus gaussien coûte O(n³) : on limite l'apprentissage
+N_MAX_PROCESSUS_GAUSSIEN = 500   # le processus gaussien coûte O(n³) : on limite l'apprentissage
 
 
 @dataclass

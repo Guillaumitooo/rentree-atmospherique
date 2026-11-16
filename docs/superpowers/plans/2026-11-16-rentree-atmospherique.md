@@ -58,7 +58,7 @@ Correspondance avec les séances (spec §9) :
 
 ---
 
-### Tâche 1 : Mise en place, constantes et modèle de bouclier
+### Task 1: Mise en place, constantes et modèle de bouclier
 
 **Files :**
 - Create : `requirements.txt`, `.gitignore`, `pytest.ini`, `core/__init__.py`, `core/constantes.py`, `core/bouclier.py`
@@ -124,7 +124,7 @@ def test_evaluer_bouclier_integre_et_duree():
 - [ ] **Étape 5 : vérifier que les tests passent.** `pytest tests/test_bouclier.py -v` affiche 5 passed.
 - [ ] **Étape 6 : commit.** `git add -A && git commit -m "feat: constants and heat shield model"`
 
-### Tâche 2 : Simulateur de trajectoire
+### Task 2: Simulateur de trajectoire
 
 **Files :** Create `core/trajectoire.py` · Test `tests/test_trajectoire.py`
 
@@ -185,7 +185,7 @@ def test_percement_propage():                         # Review Focus 4
 - [ ] **Étape 4 : vérifier que les tests passent.** `pytest tests/test_trajectoire.py -v` affiche 7 passed.
 - [ ] **Étape 5 : commit.** `feat: 2D ballistic entry simulator with skip detection`
 
-### Tâche 3 : Validation par Allen-Eggers
+### Task 3: Validation par Allen-Eggers
 
 **Files :** Create `core/validation.py` · Test `tests/test_validation.py`
 
@@ -217,7 +217,7 @@ def test_accord_simulation_leo_raide():
 - [ ] **Étape 4 : vérifier que les tests passent.** 2 passed.
 - [ ] **Étape 5 : commit.** `feat: Allen-Eggers reference formulas`
 
-### Tâche 4 : Plan d'expériences et CSV de référence
+### Task 4: Plan d'expériences et CSV de référence
 
 **Files :** Create `core/doe.py`, `scripts/generer_doe.py`, `data/doe_reference.csv` · Test `tests/test_doe.py`
 
@@ -261,7 +261,7 @@ def test_simuler_plan_petit():
   - Si ce n'est pas le cas, s'arrêter et le signaler : les bornes de la spec seraient à revoir.
 - [ ] **Étape 6 : commit (CSV inclus).** `feat: LHS design of experiments and reference dataset`
 
-### Tâche 5 : Métamodèles
+### Task 5: Métamodèles
 
 **Files :** Create `core/metamodeles.py` · Test `tests/test_metamodeles.py`
 
@@ -315,7 +315,7 @@ def test_hors_domaine():                              # Review Focus 1
 - [ ] **Étape 4 : vérifier que les tests passent.** 5 passed, en moins de 60 s.
 - [ ] **Étape 5 : commit.** `feat: surrogate models and hybrid capsule predictor`
 
-### Tâche 6 : Optimisation et vérification
+### Task 6: Optimisation et vérification
 
 **Files :** Create `core/optimisation.py` · Test `tests/test_optimisation.py`
 
@@ -362,7 +362,7 @@ def test_verifier_signale_rebond():                   # Review Focus 2
 - [ ] **Étape 4 : vérifier que les tests passent.** 4 passed.
 - [ ] **Étape 5 : commit.** `feat: SLSQP and NSGA-II optimisation with physical verification`
 
-### Tâche 7 : Socle de l'interface, Accueil, Mission et Simulation
+### Task 7: Socle de l'interface, Accueil, Mission et Simulation
 
 **Files :** Create `interface/__init__.py`, `interface/commun.py`, `app.py`, `pages/1_Mission_et_capsule.py`, `pages/2_Simulation.py` · Test `tests/test_pages.py`
 
@@ -400,7 +400,7 @@ def test_page_sans_erreur(page):
   - Lancer `streamlit run app.py` : la page Simulation affiche une rentrée à γ = −5,8° sans rebond et une rentrée à −4,8° avec rebond.
 - [ ] **Étape 5 : commit.** `feat: home, mission and simulation pages`
 
-### Tâche 8 : Pages Plan d'expériences, Métamodèles et Prédiction
+### Task 8: Pages Plan d'expériences, Métamodèles et Prédiction
 
 **Files :** Create `pages/3_Plan_d_experiences.py`, `pages/4_Metamodeles.py`, `pages/5_Prediction.py` · Modify `tests/test_pages.py` (ajouter ces pages à `PAGES`)
 
@@ -417,7 +417,7 @@ Contenu des pages :
 - [ ] **Étape 4 : vérifier que les tests passent**, puis contrôler à l'œil dans `streamlit run app.py` que la carte du couloir montre une bande faisable étroite.
 - [ ] **Étape 5 : commit.** `feat: DOE, surrogate and prediction pages`
 
-### Tâche 9 : Page Optimisation
+### Task 9: Page Optimisation
 
 **Files :** Create `pages/6_Optimisation.py` · Modify `tests/test_pages.py`
 
@@ -439,7 +439,7 @@ Contenu de la page :
   - Dans le navigateur, l'optimum se situe vers γ ≈ −5,8 à −6,0°, D = 3 m, avec une vérification verte.
 - [ ] **Étape 5 : commit.** `feat: optimisation page with Pareto front and verification`
 
-### Tâche 10 : Déploiement en ligne (séance 3)
+### Task 10: Déploiement en ligne (séance 3)
 
 **Files :** Create `README.md`
 
@@ -449,7 +449,7 @@ Contenu de la page :
 - [ ] **Étape 4 : déployer sur Streamlit Community Cloud. ⚠️ Action de l'étudiant** : sur share.streamlit.io, « New app », choisir le dépôt, `app.py` comme fichier principal et Python 3.12 dans les réglages avancés.
 - [ ] **Étape 5 : vérifier l'URL** dans une fenêtre privée. Démarrage en moins de 10 s, les 6 pages s'ouvrent, l'optimisation aboutit. Noter l'URL dans le README, puis commit `docs: README and deployment URL`.
 
-### Tâche 11 : Manuel d'utilisation (PDF) et support de présentation
+### Task 11: Manuel d'utilisation (PDF) et support de présentation
 
 **Files :** Create `docs/manuel/manuel_utilisation.md` (puis exporté en PDF) et `docs/manuel/captures/*.png`
 
@@ -466,7 +466,7 @@ Contenu de la page :
   - Scénario de démonstration de 3 minutes.
   - Commit `docs: user manual`.
 
-### Tâche 12 (extension 1) : Conduction 1D par différences finies
+### Task 12: (extension 1) Conduction 1D par différences finies
 
 **Files :** Modify `core/bouclier.py`, `core/trajectoire.py` (paramètre `modele_thermique`), `pages/2_Simulation.py` · Test `tests/test_bouclier.py`
 

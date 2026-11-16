@@ -42,3 +42,15 @@ def test_verifier_signale_rebond():  # Review Focus 2
     v = verifier(pts, MISSION_LUNAIRE)
     assert v.loc[0, "rebond_sim"]
     assert not v.loc[0, "respecte"]
+
+
+def test_slsqp_ameliore_le_criblage_avec_le_processus_gaussien():
+    # Revue finale #1 : avec les modèles par défaut, SLSQP doit atteindre l'optimum (~185 kg),
+    # pas rester au meilleur point de criblage (~222 kg).
+    p = entrainer_predicteur(pd.read_csv(CHEMIN_DOE), "Processus gaussien", "Régression logistique")
+    durcie = replace(MISSION_LUNAIRE, n_lim=9.5, ts_lim_c=230.0)
+    r = optimiser_slsqp(p, durcie)
+    assert r.succes
+    assert r.m_b < 195.0
+    front = optimiser_nsga2(p, durcie)
+    assert r.m_b <= front["m_b"].min() + 2.0

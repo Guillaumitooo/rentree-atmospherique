@@ -46,6 +46,8 @@ def test_optimisation_verifiee_par_simulation():
     at.button[0].click().run()
     assert not at.exception
     assert any("confirme" in s.value for s in at.success)
+    masse = next(m for m in at.metric if m.label == "Masse du bouclier")
+    assert float(masse.value.split()[0]) < 195  # optimum ~185 kg, pas le point de criblage (~222 kg)
     at.button[1].click().run()
     assert not at.exception
     assert not at.error

@@ -26,6 +26,7 @@ VARIABLES = ["gamma_deg", "D", "rn_sur_d", "e"]
 P_REBOND_MAX = 0.05
 E_RES_MIN = 5e-4          # marge minimale d'ablateur restant [m]
 N_CRIBLAGE = 2000         # points tirés pour trouver de bons points de départ
+TOLERANCE_RELATIVE = 1e-3 # dépassement toléré sur les contraintes normalisées en fin de SLSQP
 
 
 @dataclass
@@ -106,7 +107,9 @@ def optimiser_slsqp(pred, mission: Mission, n_departs: int = 10, graine: int = 0
             options={"maxiter": 100, "ftol": 1e-6},
         )
         x = vers_x(np.clip(res.x, 0.0, 1.0))
-        if (contraintes(x, pred, mission) >= -1e-9).all() and _masse(x) < m_meilleur:
+        # SLSQP s'arrête « sur » les contraintes actives, à une précision numérique près :
+        # on accepte un dépassement de 0,1 % de chaque limite (négligeable devant les marges).
+        if (contraintes(x, pred, mission) / echelle >= -TOLERANCE_RELATIVE).all() and _masse(x) < m_meilleur:
             meilleur, m_meilleur = x, _masse(x)
 
     predit = pred.predire(_entrees(meilleur, mission)).iloc[0].to_dict()

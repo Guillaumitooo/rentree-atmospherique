@@ -77,14 +77,23 @@ with onglet_masse:
             k[4].metric("Masse du bouclier", f"{r.m_b:.0f} kg")
 
             st.markdown("#### Vérification par simulation")
+            ts_sim = v["T_s_C_sim"]
+
+            def ok(condition: bool) -> str:
+                return "✅" if condition else "❌"
+
             tableau = pd.DataFrame({
                 "Métamodèle": [f"{100 * r.predit['p_rebond']:.1f} % de probabilité", f"{r.predit['n_max']:.2f}",
                                f"{r.predit['T_s_C']:.0f}", f"{100 * r.predit['e_res']:.2f}"],
                 "Simulation": ["oui" if v["rebond_sim"] else "non", f"{v['n_max_sim']:.2f}",
-                               "percé" if pd.isna(v["T_s_C_sim"]) else f"{v['T_s_C_sim']:.0f}",
-                               f"{100 * v['e_res_sim']:.2f}"],
+                               "percé" if pd.isna(ts_sim) else f"{ts_sim:.0f}", f"{100 * v['e_res_sim']:.2f}"],
+                "Écart": ["", f"{r.predit['n_max'] - v['n_max_sim']:+.2f}",
+                          "" if pd.isna(ts_sim) else f"{r.predit['T_s_C'] - ts_sim:+.0f}",
+                          f"{100 * (r.predit['e_res'] - v['e_res_sim']):+.2f}"],
                 "Limite de la mission": ["aucun rebond", f"≤ {mission.n_lim:.1f}", f"≤ {mission.ts_lim_c:.0f}",
                                          "> 0"],
+                "Respectée": [ok(not v["rebond_sim"]), ok(v["n_max_sim"] <= mission.n_lim),
+                              ok(not pd.isna(ts_sim) and ts_sim <= mission.ts_lim_c), ok(v["e_res_sim"] > 0)],
             }, index=["Rebond", "Décélération max [g]", "Température de structure [°C]",
                       "Épaisseur résiduelle [cm]"])
             st.table(tableau)
@@ -124,8 +133,9 @@ with onglet_pareto:
                            customdata=np.column_stack([front["gamma_deg"], front["D"], 100 * front["e"]]),
                            hovertemplate="n = %{x:.2f} g<br>m_b = %{y:.0f} kg<br>γ = %{customdata[0]:.2f}°"
                                          "<br>D = %{customdata[1]:.2f} m<br>e = %{customdata[2]:.2f} cm"),
-                go.Scatter(x=verif["n_max_sim"], y=verif["m_b"], mode="markers", name="re-simulés",
-                           marker=dict(symbol="circle-open", size=14, line=dict(width=2))),
+                go.Scatter(x=verif["n_max_sim"], y=verif["m_b"], mode="markers", name="re-simulés (vert = validé)",
+                           marker=dict(symbol="circle-open", size=14, line=dict(width=2),
+                                       color=np.where(verif["respecte"], "#2ca02c", "#d62728"))),
             ])
             fig.add_vline(x=mission.n_lim, line_dash="dash", line_color="red")
             fig.update_layout(xaxis_title="Décélération maximale n_max [g]",

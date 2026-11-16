@@ -88,3 +88,10 @@ def test_optimisation_d_min_maximal_sans_plantage():  # Revue finale #4
     at.button[0].click().run()
     assert not at.exception
     assert at.error
+
+
+def test_verification_affiche_ecarts_et_respect():  # Revue finale (spec §7.5)
+    at = lancer("vues/6_Optimisation.py").run()
+    at.button[0].click().run()
+    colonnes = list(at.table[0].value.columns)
+    assert "Écart" in colonnes and "Respectée" in colonnes

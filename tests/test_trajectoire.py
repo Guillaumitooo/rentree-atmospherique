@@ -46,3 +46,11 @@ def test_percement_propage():  # Review Focus 4
     r = simuler(Capsule(-5.6, 3.0, 1.2, 0.005, 5000.0), MISSION_LUNAIRE)
     assert r.percement is True
     assert np.isnan(r.resume()["T_s_C"])
+
+
+def test_modele_thermique_transmis():
+    c = Capsule(-5.8, **REF)
+    r_erfc = simuler(c, MISSION_LUNAIRE)
+    r_df = simuler(c, MISSION_LUNAIRE, modele_thermique="differences_finies")
+    assert r_df.Q == r_erfc.Q
+    assert r_df.T_s_C >= r_erfc.T_s_C - 5

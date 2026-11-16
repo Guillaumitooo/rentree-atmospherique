@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 import streamlit as st
 from plotly.subplots import make_subplots
 
+from core.bouclier import MODELES_THERMIQUES, temperature_structure
 from core.constantes import CD, MISSION_LEO, Capsule, Mission
 from core.trajectoire import simuler
 from core.validation import n_max_allen_eggers, q_max_allen_eggers
@@ -18,8 +19,8 @@ capsule = curseurs_capsule("sim", m_c_fixe=mission.m_c)
 
 
 @st.cache_data
-def simulation(c: Capsule, m: Mission):
-    return simuler(c, m)
+def simulation(c: Capsule, m: Mission, modele: str):
+    return simuler(c, m, modele_thermique=modele)
 
 
 @st.cache_data
@@ -42,7 +43,10 @@ def balayage_validation(D: float, rn_sur_d: float, e: float, m_c: float) -> pd.D
 onglet_sim, onglet_val = st.tabs(["Rentrée", "Validation (orbite basse)"])
 
 with onglet_sim:
-    r = simulation(capsule, mission)
+    libelles = {"erfc": "Analytique (milieu semi-infini)", "differences_finies": "Différences finies 1D"}
+    modele = st.radio("Modèle thermique du bouclier", MODELES_THERMIQUES, format_func=libelles.get,
+                      horizontal=True)
+    r = simulation(capsule, mission, modele)
     st.caption(f"Mission : **{mission.nom}** (V_E = {mission.v_entree:.0f} m/s)")
 
     if r.rebond:
@@ -84,6 +88,17 @@ with onglet_sim:
     st.plotly_chart(fig, use_container_width=True)
 
     st.caption(f"Durée simulée {r.duree:.0f} s · chauffe {r.t_ch:.0f} s · portée {r.portee / 1e3:.0f} km")
+
+    if not r.percement:
+        autre = "differences_finies" if modele == "erfc" else "erfc"
+        T_autre = temperature_structure(r.Q, r.t_ch, capsule.e, modele=autre)["T_s_C"]
+        st.info(
+            f"**Comparaison des modèles thermiques** : T_s = {r.T_s_C:.0f} °C ({libelles[modele]}) contre "
+            f"{T_autre:.0f} °C ({libelles[autre]}). Le modèle semi-infini laisse la chaleur s'échapper "
+            "indéfiniment ; les différences finies supposent une face arrière **adiabatique**, où la chaleur "
+            "s'accumule. La réalité (structure qui absorbe une partie de la chaleur) est entre les deux. "
+            "Les métamodèles et l'optimisation utilisent le modèle analytique."
+        )
 
 with onglet_val:
     st.markdown(

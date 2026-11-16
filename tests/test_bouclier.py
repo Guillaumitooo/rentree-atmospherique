@@ -39,3 +39,24 @@ def test_evaluer_bouclier_integre_et_duree():
     r = evaluer_bouclier(t, q, 0.04)
     assert r["Q"] == pytest.approx(4e7, rel=0.01)
     assert r["t_ch"] == pytest.approx(40.0, abs=0.2)
+
+
+def test_differences_finies_plus_conservatif():
+    # Face froide adiabatique : la chaleur s'accumule, donc T_s ≥ modèle semi-infini (à 5 °C près)
+    t = np.linspace(0, 400, 4001)
+    q = np.where((t >= 50) & (t <= 350), 1e6, 0.0)  # 300 s à 1 MW/m²
+    r_erfc = evaluer_bouclier(t, q, 0.04)
+    r_df = evaluer_bouclier(t, q, 0.04, modele="differences_finies")
+    assert r_df["T_s_C"] >= r_erfc["T_s_C"] - 5
+    assert r_df["e_res"] == pytest.approx(r_erfc["e_res"])
+
+
+def test_differences_finies_convergence():
+    t50 = temperature_structure(3e8, 300.0, 0.04, modele="differences_finies", n_noeuds=50)["T_s_C"]
+    t100 = temperature_structure(3e8, 300.0, 0.04, modele="differences_finies", n_noeuds=100)["T_s_C"]
+    assert abs(t100 - t50) < 1.0
+
+
+def test_differences_finies_percement():
+    r = temperature_structure(2e8, 300.0, 0.005, modele="differences_finies")
+    assert r["percement"] is True and np.isnan(r["T_s_C"])

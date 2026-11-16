@@ -59,8 +59,9 @@ def densite(h):
     return RHO0 * np.exp(-h / H_ECHELLE)
 
 
-def simuler(capsule: Capsule, mission: Mission = MISSION_LUNAIRE, mat: Materiau = MATERIAU) -> Resultat:
-    """Simule une rentrée et évalue le bouclier thermique."""
+def simuler(capsule: Capsule, mission: Mission = MISSION_LUNAIRE, mat: Materiau = MATERIAU,
+            modele_thermique: str = "erfc") -> Resultat:
+    """Simule une rentrée et évalue le bouclier thermique (modèle "erfc" ou "differences_finies")."""
     aire = np.pi * capsule.D**2 / 4
     m_b = masse_bouclier(capsule.D, capsule.e, mat)
     m = capsule.m_c + m_b
@@ -96,7 +97,7 @@ def simuler(capsule: Capsule, mission: Mission = MISSION_LUNAIRE, mat: Materiau 
     rho = densite(h)
     n = 0.5 * rho * V**2 * CD * aire / (m * G0)
     q = K_SG * np.sqrt(rho / capsule.rn) * V**3
-    thermique = evaluer_bouclier(t, q, capsule.e, mat)
+    thermique = evaluer_bouclier(t, q, capsule.e, mat, modele_thermique)
 
     return Resultat(
         t=t, V=V, gamma=gam, h=h, s=s, n=n, q=q,

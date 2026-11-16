@@ -49,3 +49,10 @@ def test_optimisation_verifiee_par_simulation():
     at.button[1].click().run()
     assert not at.exception
     assert not at.error
+
+
+def test_simulation_differences_finies():
+    at = lancer("vues/2_Simulation.py").run()
+    at.radio[0].set_value("differences_finies").run()
+    assert not at.exception
+    assert any("Comparaison des modèles" in i.value for i in at.info)

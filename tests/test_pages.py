@@ -102,3 +102,39 @@ def test_pas_de_parametre_streamlit_obsolete():
     fichiers = [RACINE / "Accueil.py", *sorted((RACINE / "vues").glob("*.py"))]
     fautifs = [f.name for f in fichiers if "use_container_width" in f.read_text(encoding="utf-8")]
     assert fautifs == []
+
+
+def test_mission_formulaire_appliquer():
+    # Bug signalé en ligne : « Appliquer » levait StreamlitWidgetAlreadyInstantiatedError
+    at = lancer("vues/1_Mission_et_capsule.py").run()
+    at.number_input[1].set_value(6000.0)          # masse hors bouclier
+    at.button[0].click().run()                    # bouton « Appliquer » du formulaire
+    assert not at.exception
+    assert at.session_state["mission"].m_c == 6000.0
+
+
+def test_mission_formulaire_appliquer_deux_fois():
+    # Bug n° 2 : le second « Appliquer » ignorait les champs modifiés
+    at = lancer("vues/1_Mission_et_capsule.py").run()
+    at.radio[0].set_value("Orbite basse")
+    at.button[0].click().run()
+    assert at.session_state["mission"].nom == "Orbite basse"
+    assert at.session_state["mission"].v_entree == 7800.0
+    at.radio[0].set_value("Retour lunaire")
+    at.number_input[1].set_value(6500.0)
+    at.button[0].click().run()
+    assert not at.exception
+    m = at.session_state["mission"]
+    assert (m.nom, m.v_entree, m.m_c) == ("Retour lunaire", 11000.0, 6500.0)
+
+
+def test_mission_formulaire_apres_aller_retour():
+    at = lancer("Accueil.py").run()
+    at.switch_page("vues/1_Mission_et_capsule.py").run()
+    at.radio[0].set_value("Orbite basse")
+    at.button[0].click().run()
+    at.switch_page("vues/2_Simulation.py").run()
+    at.switch_page("vues/1_Mission_et_capsule.py").run()
+    assert not at.exception
+    assert at.radio[0].value == "Orbite basse"
+    assert at.number_input[0].value == 7800.0

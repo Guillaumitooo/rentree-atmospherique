@@ -72,23 +72,46 @@ with col_schema:
     st.markdown(schema_capsule(D_schema, rn_schema), unsafe_allow_html=True)
 
 st.markdown("### Paramètres de la mission")
-m = mission_courante()
-with st.form("mission"):
-    choix = st.radio("Type de mission", ["Retour lunaire", "Orbite basse"],
-                     index=0 if m.nom == "Retour lunaire" else 1, horizontal=True)
+
+
+def remplir_formulaire(m) -> None:
+    """Recopie la mission dans les champs du formulaire (clés fixes « f_… »)."""
+    st.session_state.update({"f_type": m.nom, "f_v_e": float(m.v_entree), "f_m_c": float(m.m_c),
+                             "f_d_min": min(float(m.d_min), 4.8), "f_n_lim": float(m.n_lim),
+                             "f_ts_lim": float(m.ts_lim_c)})
+
+
+def appliquer() -> None:
+    """Rappel du bouton « Appliquer » : exécuté AVANT que les widgets soient recréés,
+    ce qui permet de mettre à jour la mission et les champs sans erreur Streamlit."""
+    ancienne = mission_courante()
+    s = st.session_state
+    base = MISSION_LUNAIRE if s["f_type"] == "Retour lunaire" else MISSION_LEO
+    v_e = base.v_entree if s["f_type"] != ancienne.nom else s["f_v_e"]   # nouveau type → vitesse par défaut
+    definir_mission(replace(base, v_entree=v_e, m_c=s["f_m_c"], d_min=s["f_d_min"], n_lim=s["f_n_lim"],
+                            ts_lim_c=s["f_ts_lim"]))
+    remplir_formulaire(mission_courante())
+    s["mission_appliquee"] = True
+
+
+# Champs à clés fixes : leur identité ne change pas quand la mission change.
+# Ils sont (ré)initialisés depuis la mission courante à chaque arrivée sur la page.
+if "f_type" not in st.session_state:
+    remplir_formulaire(mission_courante())
+
+with st.form("formulaire_mission"):  # clé distincte de st.session_state["mission"]
+    st.radio("Type de mission", ["Retour lunaire", "Orbite basse"], key="f_type", horizontal=True)
     c1, c2, c3, c4, c5 = st.columns(5)
-    v_e = c1.number_input("Vitesse d'entrée [m/s]", 5000.0, 12000.0, float(m.v_entree), 100.0)
-    m_c = c2.number_input("Masse hors bouclier [kg]", 1000.0, 15000.0, float(m.m_c), 100.0)
-    d_min = c3.number_input("Diamètre min. habitable [m]", 2.0, 4.8, min(float(m.d_min), 4.8), 0.1)
-    n_lim = c4.number_input("Décélération max [g]", 1.0, 20.0, float(m.n_lim), 0.5)
-    ts_lim = c5.number_input("T structure max [°C]", 100.0, 500.0, float(m.ts_lim_c), 10.0)
+    c1.number_input("Vitesse d'entrée [m/s]", 5000.0, 12000.0, step=100.0, key="f_v_e")
+    c2.number_input("Masse hors bouclier [kg]", 1000.0, 15000.0, step=100.0, key="f_m_c")
+    c3.number_input("Diamètre min. habitable [m]", 2.0, 4.8, step=0.1, key="f_d_min")
+    c4.number_input("Décélération max [g]", 1.0, 20.0, step=0.5, key="f_n_lim")
+    c5.number_input("T structure max [°C]", 100.0, 500.0, step=10.0, key="f_ts_lim")
     st.caption("Changer de type de mission remet sa vitesse d'entrée par défaut.")
-    if st.form_submit_button("Appliquer"):
-        base = MISSION_LUNAIRE if choix == "Retour lunaire" else MISSION_LEO
-        if choix != m.nom:
-            v_e = base.v_entree
-        definir_mission(replace(base, v_entree=v_e, m_c=m_c, d_min=d_min, n_lim=n_lim, ts_lim_c=ts_lim))
-        st.success("Mission mise à jour : elle s'applique à toutes les pages.")
+    st.form_submit_button("Appliquer", on_click=appliquer)
+
+if st.session_state.pop("mission_appliquee", False):
+    st.success("Mission mise à jour : elle s'applique à toutes les pages.")
 
 m = mission_courante()
 st.caption(f"Mission courante : **{m.nom}**, V_E = {m.v_entree:.0f} m/s, m_c = {m.m_c:.0f} kg, "

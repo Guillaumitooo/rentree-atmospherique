@@ -91,7 +91,7 @@ with onglet_masse:
                           "" if pd.isna(ts_sim) else f"{r.predit['T_s_C'] - ts_sim:+.0f}",
                           f"{100 * (r.predit['e_res'] - v['e_res_sim']):+.2f}"],
                 "Limite de la mission": ["aucun rebond", f"≤ {mission.n_lim:.1f}", f"≤ {mission.ts_lim_c:.0f}",
-                                         "> 0"],
+                                         "positive"],
                 "Respectée": [ok(not v["rebond_sim"]), ok(v["n_max_sim"] <= mission.n_lim),
                               ok(not pd.isna(ts_sim) and ts_sim <= mission.ts_lim_c), ok(v["e_res_sim"] > 0)],
             }, index=["Rebond", "Décélération max [g]", "Température de structure [°C]",
@@ -142,7 +142,12 @@ with onglet_pareto:
                               yaxis_title="Masse du bouclier m_b [kg]", height=500)
             st.plotly_chart(fig, width="stretch")
             st.markdown("#### Points re-simulés")
-            st.dataframe(
-                verif.assign(e_cm=100 * verif["e"])[["gamma_deg", "D", "rn_sur_d", "e_cm", "m_b", "n_max_sim",
-                                                     "ecart_n_max_pct", "T_s_C_sim", "ecart_T_s_C", "respecte"]],
-                hide_index=True, width="stretch")
+            lisible = pd.DataFrame({
+                "γ_E [°]": verif["gamma_deg"].round(2), "D [m]": verif["D"].round(2),
+                "R_n/D": verif["rn_sur_d"].round(2), "e [cm]": (100 * verif["e"]).round(2),
+                "m_b [kg]": verif["m_b"].round(0), "n_max simulé [g]": verif["n_max_sim"].round(2),
+                "écart n_max [%]": verif["ecart_n_max_pct"].round(1), "T_s simulée [°C]": verif["T_s_C_sim"].round(0),
+                "écart T_s [°C]": verif["ecart_T_s_C"].round(0),
+                "validé": verif["respecte"].map({True: "✅", False: "❌"}),
+            })
+            st.dataframe(lisible, hide_index=True, width="stretch")

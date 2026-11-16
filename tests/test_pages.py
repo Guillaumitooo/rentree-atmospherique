@@ -138,3 +138,13 @@ def test_mission_formulaire_apres_aller_retour():
     assert not at.exception
     assert at.radio[0].value == "Orbite basse"
     assert at.number_input[0].value == 7800.0
+
+
+def test_tableaux_optimisation_lisibles():
+    at = lancer("vues/6_Optimisation.py").run()
+    at.button[0].click().run()
+    limites = at.table[0].value["Limite de la mission"].tolist()
+    assert not any(str(v).lstrip().startswith(">") for v in limites)  # « > » = citation Markdown
+    at.button[1].click().run()
+    colonnes = list(at.dataframe[0].value.columns)
+    assert "γ_E [°]" in colonnes and "gamma_deg" not in colonnes

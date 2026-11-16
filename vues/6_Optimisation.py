@@ -8,7 +8,7 @@ import streamlit as st
 
 from core.constantes import Mission
 from core.optimisation import optimiser_nsga2, optimiser_slsqp, verifier
-from interface.commun import mission_courante, modeles_choisis, predicteur
+from interface.commun import alertes_domaine, mission_courante, modeles_choisis, predicteur
 
 st.set_page_config(page_title="Optimisation", page_icon="🚀", layout="wide")
 st.title("6. Optimisation")
@@ -17,6 +17,10 @@ mission = mission_courante()
 nom_reg, nom_clf = modeles_choisis()
 st.caption(f"Mission : **{mission.nom}** (m_c = {mission.m_c:.0f} kg, D ≥ {mission.d_min:.1f} m, "
            f"n ≤ {mission.n_lim:.1f} g, T_s ≤ {mission.ts_lim_c:.0f} °C) · métamodèles : {nom_reg} / {nom_clf}")
+alertes = alertes_domaine(mission)
+for alerte in alertes:
+    st.warning(f"⚠️ {alerte} Les solutions proposées ne sont pas fiables : seule la vérification par "
+               "simulation fait foi.")
 
 st.markdown(
     """
@@ -86,6 +90,9 @@ with onglet_masse:
             st.table(tableau)
             if v["respecte"]:
                 st.success("✅ La simulation confirme : toutes les contraintes de la mission sont respectées.")
+            elif alertes:
+                st.error("❌ La simulation **invalide** cette solution : le métamodèle extrapole hors de son "
+                         "domaine (voir l'avertissement en haut de page). Revenez dans le domaine étudié.")
             else:
                 st.error("❌ La simulation **invalide** cette solution : une contrainte est violée. "
                          "Augmentez les marges de sécurité.")

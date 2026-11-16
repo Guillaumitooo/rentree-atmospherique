@@ -23,6 +23,7 @@ from core.doe import est_faisable
 from core.trajectoire import simuler
 
 VARIABLES = ["gamma_deg", "D", "rn_sur_d", "e"]
+D_MAX = 5.0               # diamètre maximal (coiffe du lanceur) [m]
 P_REBOND_MAX = 0.05
 E_RES_MIN = 5e-4          # marge minimale d'ablateur restant [m]
 N_CRIBLAGE = 2000         # points tirés pour trouver de bons points de départ
@@ -39,7 +40,12 @@ class ResultatOptim:
 
 
 def bornes_optim(mission: Mission) -> list[tuple]:
-    return [(-7.0, -4.5), (mission.d_min, 5.0), (0.5, 1.5), (0.01, 0.06)]
+    return [(-7.0, -4.5), (mission.d_min, D_MAX), (0.5, 1.5), (0.01, 0.06)]
+
+
+def bornes_valides(mission: Mission) -> bool:
+    """Le domaine de recherche existe-t-il ? (D_min doit rester sous le diamètre maximal)"""
+    return mission.d_min < D_MAX - 1e-6
 
 
 def _entrees(X: np.ndarray, mission: Mission) -> pd.DataFrame:
@@ -77,6 +83,10 @@ def optimiser_slsqp(pred, mission: Mission, n_departs: int = 10, graine: int = 0
     2. Affinage : SLSQP part des n_departs meilleurs points faisables.
     On garde la meilleure solution faisable rencontrée.
     """
+    if not bornes_valides(mission):
+        return ResultatOptim(False, {}, float("nan"), {},
+                             f"Le diamètre minimal ({mission.d_min:.1f} m) ne laisse aucune marge "
+                             f"sous le diamètre maximal ({D_MAX:.1f} m)")
     bornes = bornes_optim(mission)
     bas = np.array([b[0] for b in bornes])
     haut = np.array([b[1] for b in bornes])
@@ -135,6 +145,8 @@ class _ProblemeCapsule(Problem):
 def optimiser_nsga2(pred, mission: Mission, pop: int = 80, generations: int = 60,
                     graine: int = 0) -> pd.DataFrame:
     """Front de Pareto masse du bouclier / décélération (algorithme génétique NSGA-II)."""
+    if not bornes_valides(mission):
+        return pd.DataFrame(columns=VARIABLES + ["m_b", "n_max"])
     res = pymoo_minimize(_ProblemeCapsule(pred, mission), NSGA2(pop_size=pop),
                          ("n_gen", generations), seed=graine, verbose=False)
     if res.X is None:

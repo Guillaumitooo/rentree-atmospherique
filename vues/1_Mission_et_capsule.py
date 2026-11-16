@@ -79,7 +79,7 @@ with st.form("mission"):
     c1, c2, c3, c4, c5 = st.columns(5)
     v_e = c1.number_input("Vitesse d'entrée [m/s]", 5000.0, 12000.0, float(m.v_entree), 100.0)
     m_c = c2.number_input("Masse hors bouclier [kg]", 1000.0, 15000.0, float(m.m_c), 100.0)
-    d_min = c3.number_input("Diamètre min. habitable [m]", 2.0, 5.0, float(m.d_min), 0.1)
+    d_min = c3.number_input("Diamètre min. habitable [m]", 2.0, 4.8, min(float(m.d_min), 4.8), 0.1)
     n_lim = c4.number_input("Décélération max [g]", 1.0, 20.0, float(m.n_lim), 0.5)
     ts_lim = c5.number_input("T structure max [°C]", 100.0, 500.0, float(m.ts_lim_c), 10.0)
     st.caption("Changer de type de mission remet sa vitesse d'entrée par défaut.")

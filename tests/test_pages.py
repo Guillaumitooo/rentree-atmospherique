@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from streamlit.testing.v1 import AppTest
 
-from core.constantes import MISSION_LUNAIRE
+from core.constantes import MISSION_LEO, MISSION_LUNAIRE
 
 RACINE = Path(__file__).resolve().parent.parent
 PAGES = ["Accueil.py", "vues/0_Accueil.py", "vues/1_Mission_et_capsule.py", "vues/2_Simulation.py",
@@ -69,3 +69,22 @@ def test_choix_modele_conserve_entre_pages():
     at.run()  # une interaction sur la page Prédiction
     assert not at.exception
     assert any("Forêt aléatoire" in c.value for c in at.caption)
+
+
+@pytest.mark.parametrize("mission", [replace(MISSION_LEO), replace(MISSION_LUNAIRE, m_c=12_000.0),
+                                     replace(MISSION_LUNAIRE, d_min=2.0)])
+def test_optimisation_avertit_hors_domaine(mission):  # Revue finale #3
+    at = lancer("vues/6_Optimisation.py")
+    at.session_state["mission"] = mission
+    at.run()
+    assert not at.exception
+    assert any("domaine" in w.value for w in at.warning)
+
+
+def test_optimisation_d_min_maximal_sans_plantage():  # Revue finale #4
+    at = lancer("vues/6_Optimisation.py")
+    at.session_state["mission"] = replace(MISSION_LUNAIRE, d_min=5.0)
+    at.run()
+    at.button[0].click().run()
+    assert not at.exception
+    assert at.error

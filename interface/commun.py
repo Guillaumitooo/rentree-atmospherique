@@ -11,6 +11,22 @@ REGRESSION_DEFAUT = "Processus gaussien"
 CLASSIFIEUR_DEFAUT = "Régression logistique"
 
 
+def alertes_domaine(mission: Mission) -> list[str]:
+    """Raisons pour lesquelles les métamodèles extrapoleraient pour cette mission."""
+    alertes = []
+    if mission.v_entree != MISSION_LUNAIRE.v_entree or mission.h_entree != MISSION_LUNAIRE.h_entree:
+        alertes.append("Les métamodèles ont été entraînés pour le retour lunaire (11 km/s depuis 120 km) : "
+                       "cette mission est hors de leur domaine.")
+    m_lo, m_hi = BORNES_DOE["m_c"]
+    if not m_lo <= mission.m_c <= m_hi:
+        alertes.append(f"La masse hors bouclier ({mission.m_c:,.0f} kg) sort du domaine du plan "
+                       f"d'expériences ({m_lo:,.0f} à {m_hi:,.0f} kg).".replace(",", " "))
+    if mission.d_min < BORNES_DOE["D"][0]:
+        alertes.append(f"Le diamètre minimal ({mission.d_min:.1f} m) descend sous le domaine du plan "
+                       f"d'expériences ({BORNES_DOE['D'][0]:.1f} m) : l'optimiseur peut extrapoler.")
+    return alertes
+
+
 def modeles_choisis() -> tuple[str, str]:
     """(nom du modèle de régression, nom du classifieur) choisis sur la page Métamodèles."""
     return (st.session_state.get("nom_reg", REGRESSION_DEFAUT),

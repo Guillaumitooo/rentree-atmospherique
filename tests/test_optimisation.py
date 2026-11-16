@@ -54,3 +54,10 @@ def test_slsqp_ameliore_le_criblage_avec_le_processus_gaussien():
     assert r.m_b < 195.0
     front = optimiser_nsga2(p, durcie)
     assert r.m_b <= front["m_b"].min() + 2.0
+
+
+def test_d_min_au_maximum_renvoie_un_echec(pred):  # Revue finale #4
+    m = replace(MISSION_LUNAIRE, d_min=5.0)
+    r = optimiser_slsqp(pred, m)
+    assert r.succes is False and r.message
+    assert optimiser_nsga2(pred, m, pop=20, generations=5).empty

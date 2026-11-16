@@ -7,7 +7,8 @@ import streamlit as st
 from core.constantes import PA
 from core.metamodeles import hors_domaine
 from core.trajectoire import simuler
-from interface.commun import curseurs_capsule, mission_courante, modeles_choisis, predicteur
+from interface.commun import (alertes_domaine, curseurs_capsule, mission_courante, modeles_choisis,
+                              predicteur)
 
 st.set_page_config(page_title="Prédiction", page_icon="🚀", layout="wide")
 st.title("5. Prédiction")
@@ -21,9 +22,9 @@ X = pd.DataFrame([{c: getattr(capsule, c) for c in PA}])
 if hors_domaine(X)[0]:
     st.warning("⚠️ Ce point sort du domaine du plan d'expériences : le métamodèle **extrapole**, "
                "sa prédiction n'est pas fiable. Seule la simulation fait foi.")
-if mission.nom != "Retour lunaire" or mission.v_entree != 11_000.0:
-    st.warning("⚠️ Les métamodèles ont été entraînés pour le retour lunaire à 11 km/s : "
-               "hors domaine pour cette mission.")
+for alerte in alertes_domaine(mission):
+    if "diamètre minimal" not in alerte:   # sans objet ici : D est choisi au curseur
+        st.warning(f"⚠️ {alerte}")
 
 pred = predicteur(nom_reg, nom_clf)
 t0 = time.perf_counter()

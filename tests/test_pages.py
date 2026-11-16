@@ -58,3 +58,14 @@ def test_simulation_differences_finies():
     at.radio[0].set_value("differences_finies").run()
     assert not at.exception
     assert any("Comparaison des modèles" in i.value for i in at.info)
+
+
+def test_choix_modele_conserve_entre_pages():
+    # Revue finale #2 : le modèle choisi page 4 doit survivre aux interactions sur les autres pages
+    at = lancer("Accueil.py").run()
+    at.switch_page("vues/4_Metamodeles.py").run()
+    at.selectbox(key="nom_reg").set_value("Forêt aléatoire").run()
+    at.switch_page("vues/5_Prediction.py").run()
+    at.run()  # une interaction sur la page Prédiction
+    assert not at.exception
+    assert any("Forêt aléatoire" in c.value for c in at.caption)

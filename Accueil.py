@@ -13,4 +13,10 @@ PAGES = [
     st.Page("vues/6_Optimisation.py", title="6. Optimisation", icon="🎯"),
 ]
 
+# Streamlit efface la valeur d'un widget quand sa page n'est pas affichée : on recopie les choix
+# de modèles de la page 4 pour qu'ils restent valables sur les pages Prédiction et Optimisation.
+for cle in ("nom_reg", "nom_clf"):
+    if cle in st.session_state:
+        st.session_state[cle] = st.session_state[cle]
+
 st.navigation(PAGES).run()
